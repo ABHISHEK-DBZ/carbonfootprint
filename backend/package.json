@@ -1,0 +1,21 @@
+{
+  "name": "carbon-footprint-backend",
+  "version": "1.0.0",
+  "description": "API for the Carbon Footprint Awareness Platform - calculation engine, recommendation engine, and lightweight tracking.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node --test test/*.test.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "_meta": {
+    "purpose": "Approximate emission factors for awareness/education purposes. Not a certified accounting tool.",
+    "sources": "Derived from commonly published ranges (IPCC, Our World in Data, national grid disclosures). Values are simplified averages.",
+    "region_default": "IN",
+    "lastReviewed": "2026-06"
+  },
+  "transport": {
+    "car_petrol_km": 0.192,
+    "car_diesel_km": 0.171,
+    "car_cng_km": 0.103,
+    "car_electric_km": 0.053,
+    "two_wheeler_km": 0.072,
+    "bus_km": 0.105,
+    "train_km": 0.041,
+    "metro_km": 0.035,
+    "flight_short_haul_km": 0.255,
+    "flight_long_haul_km": 0.150,
+    "cycling_walking_km": 0
+  },
+  "electricity": {
+    "grid_kg_per_kwh": 0.82,
+    "renewable_kg_per_kwh": 0.05
+  },
+  "diet": {
+    "heavy_meat_daily_kg": 7.19,
+    "medium_meat_daily_kg": 5.63,
+    "low_meat_daily_kg": 4.67,
+    "pescatarian_daily_kg": 3.91,
+    "vegetarian_daily_kg": 3.81,
+    "vegan_daily_kg": 2.89
+  },
+  "waste": {
+    "landfill_kg_per_kg": 0.58,
+    "recycled_kg_per_kg": 0.12,
+    "composted_kg_per_kg": 0.05
+  },
+  "benchmarks": {
+    "india_avg_annual_tonnes": 1.9,
+    "global_avg_annual_tonnes": 4.7,
+    "paris_aligned_target_annual_tonnes": 2.0
+  }
+}
