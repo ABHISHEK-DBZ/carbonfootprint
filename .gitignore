@@ -6,3 +6,5 @@ npm-debug.log*
 coverage/
 *.log
 MASTER_PROMPT.md
+
+.vercel
