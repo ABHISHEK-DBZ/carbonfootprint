@@ -1,13 +1,14 @@
 'use strict';
 
 const { calculateTotal } = require('./emissionEngine');
+const { num, round2, formatKg, withPath } = require('./utils');
 
 /**
  * Each action knows (a) whether it is relevant for this user's answers and
  * (b) how to simulate "what if you did this" by producing a modified copy
  * of the input. The actual CO2 impact is computed by re-running the real
- * emission engine on the modified input, not a hard-coded guess - this is
- * what keeps the advice grounded in the user's own numbers.
+ * emission engine on the modified input, not a hard-coded guess - this
+ * is what keeps the advice grounded in the user's own numbers.
  */
 const ACTIONS = [
   {
@@ -164,33 +165,10 @@ function buildNextQuestion(dominantCategory, recommendations, labels) {
 
 // --- helpers -------------------------------------------------------------
 
-function num(value, fallback = 0) {
-  const n = Number(value);
-  return Number.isFinite(n) ? n : fallback;
-}
-
-function round2(n) {
-  return Math.round(n * 100) / 100;
-}
-
-function formatKg(kg) {
-  if (kg >= 1000) return `${round2(kg / 1000)} t`;
-  return `${round2(kg)} kg`;
-}
-
 function avgTripKm(input) {
   // Rough average one-way commute distance used only to size the "skip N trips" simulation.
   const weekly = num(input.transport?.carKmPerWeek);
   return weekly > 0 ? Math.min(20, weekly / 6) : 10;
-}
-
-/** Returns a deep-enough clone of input with `path` (e.g. "diet.dietType") replaced by updater(currentValue). */
-function withPath(input, path, updater) {
-  const clone = JSON.parse(JSON.stringify(input || {}));
-  const [section, key] = path.split('.');
-  clone[section] = clone[section] || {};
-  clone[section][key] = updater(clone[section][key]);
-  return clone;
 }
 
 module.exports = { generateInsights, ACTIONS };

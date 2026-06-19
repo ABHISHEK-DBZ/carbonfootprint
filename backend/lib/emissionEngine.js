@@ -1,16 +1,12 @@
 'use strict';
 
 const factors = require('../data/factors.json');
+const { num, round2 } = require('./utils');
 
 /**
  * All functions here are pure (no I/O, no side effects) so they are easy to
  * unit test and reuse from the API layer, a CLI, or a future mobile client.
  */
-
-function num(value, fallback = 0) {
-  const n = Number(value);
-  return Number.isFinite(n) && n >= 0 ? n : fallback;
-}
 
 /**
  * @param {object} input
@@ -33,8 +29,8 @@ function calculateTransport(input = {}) {
   const carKg = carAnnualKm * carFactor;
   const twoWheelerKg = twoWheelerAnnualKm * f.two_wheeler_km;
   const transitKg = transitAnnualKm * transitFactor;
-  const shortFlightsKg = num(input.flightsShortHaulPerYear) * 1500 * f.flight_short_haul_km; // ~1500km avg short-haul
-  const longFlightsKg = num(input.flightsLongHaulPerYear) * 6000 * f.flight_long_haul_km; // ~6000km avg long-haul
+  const shortFlightsKg = num(input.flightsShortHaulPerYear) * 1500 * f.flight_short_haul_km;
+  const longFlightsKg = num(input.flightsLongHaulPerYear) * 6000 * f.flight_long_haul_km;
 
   return round2(carKg + twoWheelerKg + transitKg + shortFlightsKg + longFlightsKg);
 }
@@ -97,10 +93,6 @@ function calculateTotal(input = {}) {
     totalTonnesPerYear: round2(totalKg / 1000),
     benchmarks: factors.benchmarks
   };
-}
-
-function round2(n) {
-  return Math.round(n * 100) / 100;
 }
 
 module.exports = {
