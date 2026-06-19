@@ -231,14 +231,15 @@ document.getElementById('track-btn').addEventListener('click', async () => {
 async function renderHistory(anonymousId) {
   const list = document.getElementById('history-list');
   try {
-    const { entries } = await getJSON(`/track/${anonymousId}`);
+    const { entries } = await getJSON(`/track?id=${anonymousId}`);
     list.innerHTML = '';
     entries
       .slice()
       .reverse()
       .forEach((entry) => {
         const li = document.createElement('li');
-        const date = new Date(entry.recordedAt).toLocaleDateString();
+        const ts = entry.timestamp || entry.recordedAt;
+        const date = ts ? new Date(ts).toLocaleDateString() : 'N/A';
         li.innerHTML = `<span>${date}</span><span>${entry.totalTonnesPerYear.toFixed(2)} t CO₂e/yr</span>`;
         list.appendChild(li);
       });
