@@ -20,15 +20,36 @@ function formatKg(kg) {
 }
 
 /**
- * Returns a shallow-enough clone of input with `path` (e.g. "diet.dietType")
- * replaced by updater(currentValue). Uses Object.assign for speed.
+ * Returns a deep clone of input with `path` (e.g. "diet.dietType")
+ * replaced by updater(currentValue). Uses structuredClone for correctness.
  */
 function withPath(input, path, updater) {
-  const clone = { ...input };
+  const clone = structuredClone(input || {});
   const [section, key] = path.split('.');
-  clone[section] = { ...(clone[section] || {}) };
+  if (!clone[section]) clone[section] = {};
   clone[section][key] = updater(clone[section][key]);
   return clone;
 }
 
-module.exports = { num, round2, formatKg, withPath };
+/**
+ * Escape HTML special characters to prevent XSS.
+ * Works in both browser and Node.js environments.
+ */
+function escapeHtml(str) {
+  if (typeof str !== 'string') return String(str);
+  const escapeMap = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+  return str.replace(/[&<>"']/g, (char) => escapeMap[char]);
+}
+
+/**
+ * Debounce function calls for performance.
+ */
+function debounce(fn, ms = 300) {
+  let timer;
+  return (...args) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn(...args), ms);
+  };
+}
+
+module.exports = { num, round2, formatKg, withPath, escapeHtml, debounce };

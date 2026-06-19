@@ -1,10 +1,10 @@
 'use strict';
 
 /**
- * API_BASE resolves to a same-origin "/api" when the frontend is served by
- * the bundled Express server (recommended - see README). If opened directly
- * as a file, it falls back to a local dev server on port 4000.
+ * Carbon Ledger — Frontend Application
+ * Handles form submission, API calls, result rendering, and tracking.
  */
+
 const API_BASE = location.protocol === 'file:' ? 'http://localhost:4000/api' : '/api';
 
 const form = document.getElementById('footprint-form');
@@ -46,8 +46,11 @@ form.addEventListener('submit', async (event) => {
 
 function setBusy(isBusy) {
   const button = form.querySelector('button[type="submit"]');
+  const textEl = button.querySelector('.btn-calc__text');
+  const loadingEl = button.querySelector('.btn-calc__loading');
   button.disabled = isBusy;
-  button.textContent = isBusy ? 'Calculating…' : 'Calculate my footprint';
+  textEl.hidden = isBusy;
+  loadingEl.hidden = !isBusy;
 }
 
 function collectPayload(formEl) {
@@ -137,6 +140,8 @@ function renderBreakdown(breakdown, totalKg) {
   const list = document.getElementById('breakdown-list');
   list.innerHTML = '';
 
+  const fragment = document.createDocumentFragment();
+
   Object.entries(breakdown)
     .sort((a, b) => b[1] - a[1])
     .forEach(([key, kg]) => {
@@ -146,15 +151,17 @@ function renderBreakdown(breakdown, totalKg) {
       const li = document.createElement('li');
       li.innerHTML = `
         <div class="breakdown__label">
-          <span>${meta.icon} ${meta.label}</span>
+          <span>${escapeHtml(meta.icon)} ${escapeHtml(meta.label)}</span>
           <span class="breakdown__value">${(kg / 1000).toFixed(2)} t · ${share}%</span>
         </div>
         <div class="breakdown__bar-track">
           <div class="breakdown__bar-fill" style="width:${share}%"></div>
         </div>
       `;
-      list.appendChild(li);
+      fragment.appendChild(li);
     });
+
+  list.appendChild(fragment);
 }
 
 /* ----------------------------- Assistant ----------------------------- */
@@ -173,19 +180,23 @@ function renderAssistant(insights) {
     return;
   }
 
+  const fragment = document.createDocumentFragment();
+
   insights.recommendations.forEach((rec) => {
     const chip = document.createElement('button');
     chip.type = 'button';
     chip.className = 'chip';
     chip.dataset.difficulty = rec.difficulty;
-    chip.textContent = `${rec.title} (saves ~${formatKg(rec.estimatedImpactKgPerYear)}/yr, ${rec.difficulty})`;
+    chip.textContent = `${escapeHtml(rec.title)} (saves ~${formatKg(rec.estimatedImpactKgPerYear)}/yr, ${rec.difficulty})`;
     chip.addEventListener('click', () => {
-      addBubble(thread, `Noted — "${rec.title}" could save roughly ${formatKg(rec.estimatedImpactKgPerYear)} per year. Try it for a few weeks, then recalculate to see your new number.`);
+      addBubble(thread, `Noted — "${escapeHtml(rec.title)}" could save roughly ${formatKg(rec.estimatedImpactKgPerYear)} per year. Try it for a few weeks, then recalculate to see your new number.`);
       chip.disabled = true;
       chip.style.opacity = '0.6';
     });
-    actions.appendChild(chip);
+    fragment.appendChild(chip);
   });
+
+  actions.appendChild(fragment);
 }
 
 function addBubble(container, text, isQuestion = false) {
@@ -197,6 +208,12 @@ function addBubble(container, text, isQuestion = false) {
 
 function formatKg(kg) {
   return kg >= 1000 ? `${(kg / 1000).toFixed(2)} t` : `${Math.round(kg)} kg`;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
 }
 
 /* ----------------------------- Tracking ----------------------------- */
@@ -233,6 +250,7 @@ async function renderHistory(anonymousId) {
   try {
     const { entries } = await getJSON(`/track?id=${anonymousId}`);
     list.innerHTML = '';
+    const fragment = document.createDocumentFragment();
     entries
       .slice()
       .reverse()
@@ -240,9 +258,10 @@ async function renderHistory(anonymousId) {
         const li = document.createElement('li');
         const ts = entry.timestamp || entry.recordedAt;
         const date = ts ? new Date(ts).toLocaleDateString() : 'N/A';
-        li.innerHTML = `<span>${date}</span><span>${entry.totalTonnesPerYear.toFixed(2)} t CO₂e/yr</span>`;
-        list.appendChild(li);
+        li.innerHTML = `<span>${escapeHtml(date)}</span><span>${entry.totalTonnesPerYear.toFixed(2)} t CO₂e/yr</span>`;
+        fragment.appendChild(li);
       });
+    list.appendChild(fragment);
   } catch {
     // Non-fatal: history is a bonus feature, calculator still works without it.
   }
