@@ -231,7 +231,7 @@ document.getElementById('track-btn').addEventListener('click', async () => {
 async function renderHistory(anonymousId) {
   const list = document.getElementById('history-list');
   try {
-    const { entries } = await getJSON(`/track?id=${anonymousId}`);
+    const { entries } = await getJSON(`/track/${anonymousId}`);
     list.innerHTML = '';
     entries
       .slice()
